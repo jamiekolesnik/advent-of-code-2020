@@ -37,27 +37,15 @@ public class Day04 {
                 String passportField = entry.getKey();
                 Predicate<String> condition = entry.getValue();
 
-                if (passport.size() == 8) {
+                if (passport.size() == 8 || (!passport.containsKey("cid") && passport.size() == 7)) {
                     if (condition.test(passport.get(passportField))) {
                         conditionsCount++;
                     } else {
                         break;
                     }
-                    if (conditionsCount == 8) {
-                        passportCount++;
-                    }
-                } else if (!passport.containsKey("cid") && passport.size() == 7) {
-                    if (passportField.equals("cid")) {
-                        continue;
-                    }
-                    if (condition.test(passport.get(passportField))) {
-                        conditionsCount++;
-                    } else {
-                        break;
-                    }
-                    if (conditionsCount == 7) {
-                        passportCount++;
-                    }
+                }
+                if (conditionsCount == passport.size()) {
+                    passportCount++;
                 }
             }
         }
