@@ -32,21 +32,21 @@ public class Day04 {
 
         for (Map<String, String> passport : formattedPassports) {
             int conditionsCount = 0;
+            if (passport.size() == 8 || (passport.size() == 7 && !passport.containsKey("cid"))) {
+                for (Map.Entry<String, Predicate<String>> entry : conditions.entrySet()) {
+                    String passportField = entry.getKey();
+                    Predicate<String> condition = entry.getValue();
 
-            for (Map.Entry<String, Predicate<String>> entry : conditions.entrySet()) {
-                String passportField = entry.getKey();
-                Predicate<String> condition = entry.getValue();
-
-                if (passport.size() == 8 || (!passport.containsKey("cid") && passport.size() == 7)) {
                     if (condition.test(passport.get(passportField))) {
                         conditionsCount++;
                     } else {
                         break;
                     }
                 }
-                if (conditionsCount == passport.size()) {
-                    passportCount++;
-                }
+            }
+
+            if (conditionsCount == 8) {
+                passportCount++;
             }
         }
 
