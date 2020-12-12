@@ -28,6 +28,44 @@ public class Day04 {
         int passportCount = 0;
         List<Map<String, String>> formattedPassports = formatPassports(passportBatch);
 
+        Map<String, Predicate<String>> conditions = createPassportValidityConditions();
+
+        for (Map<String, String> passport : formattedPassports) {
+            int conditionsCount = 0;
+
+            for (Map.Entry<String, Predicate<String>> entry : conditions.entrySet()) {
+                String passportField = entry.getKey();
+                Predicate<String> condition = entry.getValue();
+
+                if (passport.size() == 8) {
+                    if (condition.test(passport.get(passportField))) {
+                        conditionsCount++;
+                    } else {
+                        break;
+                    }
+                    if (conditionsCount == 8) {
+                        passportCount++;
+                    }
+                } else if (!passport.containsKey("cid") && passport.size() == 7) {
+                    if (passportField.equals("cid")) {
+                        continue;
+                    }
+                    if (condition.test(passport.get(passportField))) {
+                        conditionsCount++;
+                    } else {
+                        break;
+                    }
+                    if (conditionsCount == 7) {
+                        passportCount++;
+                    }
+                }
+            }
+        }
+
+        return passportCount;
+    }
+
+    private static Map<String, Predicate<String>> createPassportValidityConditions() {
         Map<String, Predicate<String>> conditions = new HashMap<>();
 
         conditions.put("byr", byr -> Integer.parseInt(byr) >= 1920 && Integer.parseInt(byr) <= 2002);
@@ -47,42 +85,7 @@ public class Day04 {
 
         // true, because this criteria doesn't matter at all IF it exists
         conditions.put("cid", cid -> true);
-
-        for (Map<String, String> passport : formattedPassports) {
-            int conditionsCount = 0;
-
-            if (passport.size() == 8) {
-                for (String passportField : conditions.keySet()) {
-                    if (conditions.get(passportField).test(passport.get(passportField))) {
-                        conditionsCount++;
-                    } else {
-                        break;
-                    }
-                }
-
-                if (conditionsCount == 8) {
-                    passportCount++;
-                }
-
-            } else if (!passport.containsKey("cid") && passport.size() == 7) {
-
-                for (String passportField : conditions.keySet()) {
-                    if (passportField.equals("cid")) {
-                        continue;
-                    }
-                    if (conditions.get(passportField).test(passport.get(passportField))) {
-                        conditionsCount++;
-                    } else {
-                        break;
-                    }
-                }
-                if (conditionsCount == 7) {
-                    passportCount++;
-                }
-            }
-        }
-
-        return passportCount;
+        return conditions;
     }
 
     private static List<Map<String, String>> formatPassports(String passportBatch) {
