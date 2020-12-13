@@ -1,7 +1,6 @@
 package days;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 // Problem Description: https://adventofcode.com/2020/day/4
 public class Day04 {
@@ -28,16 +27,15 @@ public class Day04 {
         int passportCount = 0;
         List<Map<String, String>> formattedPassports = formatPassports(passportBatch);
 
-        Map<String, Predicate<String>> conditions = createPassportValidityConditions();
-
         for (Map<String, String> passport : formattedPassports) {
             int conditionsCount = 0;
             if (passport.size() == 8 || (passport.size() == 7 && !passport.containsKey("cid"))) {
-                for (Map.Entry<String, Predicate<String>> entry : conditions.entrySet()) {
-                    String passportField = entry.getKey();
-                    Predicate<String> condition = entry.getValue();
 
-                    if (condition.test(passport.get(passportField))) {
+                for (Map.Entry<String, String> entry : passport.entrySet()) {
+                    String passportField = entry.getKey();
+                    String passportFieldValue = entry.getValue();
+
+                    if (isValidCondition(passportField, passportFieldValue)) {
                         conditionsCount++;
                     } else {
                         break;
@@ -45,7 +43,7 @@ public class Day04 {
                 }
             }
 
-            if (conditionsCount == 8) {
+            if (conditionsCount == passport.size()) {
                 passportCount++;
             }
         }
@@ -53,27 +51,33 @@ public class Day04 {
         return passportCount;
     }
 
-    private static Map<String, Predicate<String>> createPassportValidityConditions() {
-        Map<String, Predicate<String>> conditions = new HashMap<>();
+    private static boolean isValidCondition(String passportField, String passportFieldValue) {
 
-        conditions.put("byr", byr -> Integer.parseInt(byr) >= 1920 && Integer.parseInt(byr) <= 2002);
-        conditions.put("iyr", iyr -> Integer.parseInt(iyr) >= 2010 && Integer.parseInt(iyr) <= 2020);
-        conditions.put("eyr", eyr -> Integer.parseInt(eyr) >= 2020 && Integer.parseInt(eyr) <= 2030);
-        // Height: If cm, the number must be at least 150 and at most 193. *OR* If in, the number must be at least 59 and at most 76.
-        conditions.put("hgt", hgt -> hgt.matches("^1(([5][0-9])|([6-8][0-9])|([9][0-3]))cm$") || hgt.matches("^((59)|(6[0-9])|(7[0-6]))in$"));
-
-        // Hair Color: a # followed by exactly six characters 0-9 or a-f
-        conditions.put("hcl", hcl -> hcl.length() == 7 && hcl.matches("^#([a-f0-9]{6}|[a-f0-9]{3})$"));
-
-        List<String> eyeColors = Arrays.asList("amb", "blu", "brn", "gry", "grn", "hzl", "oth");
-        conditions.put("ecl", eyeColors::contains);
-
-        // Passport id: between 0-9, with 9 digits
-        conditions.put("pid", pid -> pid.matches("^[0-9]{9}$"));
-
-        // true, because this criteria doesn't matter at all IF it exists
-        conditions.put("cid", cid -> true);
-        return conditions;
+        switch(passportField){
+            case "byr":
+                return Integer.parseInt(passportFieldValue) >= 1920 && Integer.parseInt(passportFieldValue) <= 2002;
+            case "iyr":
+                return Integer.parseInt(passportFieldValue) >= 2010 && Integer.parseInt(passportFieldValue) <= 2020;
+            case "eyr":
+                return Integer.parseInt(passportFieldValue) >= 2020 && Integer.parseInt(passportFieldValue) <= 2030;
+            case "hgt":
+                // Height: If cm, the number must be at least 150 and at most 193. *OR* If in, the number must be at least 59 and at most 76.
+                return  passportFieldValue.matches("^1(([5][0-9])|([6-8][0-9])|([9][0-3]))cm$") || passportFieldValue.matches("^((59)|(6[0-9])|(7[0-6]))in$");
+            case "hcl":
+                // Hair Color: a # followed by exactly six characters 0-9 or a-f
+                return passportFieldValue.length() == 7 && passportFieldValue.matches("^#([a-f0-9]{6}|[a-f0-9]{3})$");
+            case "ecl":
+                List<String> eyeColors = Arrays.asList("amb", "blu", "brn", "gry", "grn", "hzl", "oth");
+                return eyeColors.contains(passportFieldValue);
+            case "pid":
+                // Passport id: between 0-9, with 9 digits
+                return passportFieldValue.matches("^[0-9]{9}$");
+            case "cid":
+                // true, because this criteria doesn't matter at all IF it exists
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static List<Map<String, String>> formatPassports(String passportBatch) {
