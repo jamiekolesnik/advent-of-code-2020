@@ -626,6 +626,20 @@ public class Day07 {
         List<Bag> goldParents = getGoldGrandParents(allBags, directGoldParents, directGoldParents.size());
 
         System.out.println(goldParents.size());
+
+        Bag goldBag = allBags.stream().filter(bag -> bag.getColor().equals("shiny gold")).findFirst().orElse(null);
+        if (goldBag == null) {
+            System.out.println(0);
+        } else {
+            List<Bag> directGoldChildren = new ArrayList<>(goldBag.getInnerBags().keySet());
+            List<Bag> goldchildren = getGoldChildren(allBags, directGoldChildren);
+            System.out.println(goldchildren.size());
+        }
+    }
+
+    // Implement
+    private static List<Bag> getGoldChildren(List<Bag> allBags, List<Bag> directGoldChildren) {
+        return null;
     }
 
     private static List<Bag> getGoldGrandParents(List<Bag> allBags, List<Bag> goldParents, int added) {
