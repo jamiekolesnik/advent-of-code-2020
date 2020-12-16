@@ -612,7 +612,15 @@ public class Day07 {
                 "faded blue bags contain no other bags.\n" +
                 "dotted black bags contain no other bags.";
 
-        List<String> bagsText = Arrays.asList(unformattedBagRules2.split("\n"));
+        String unformattedBagRules3 = "shiny gold bags contain 2 dark red bags.\n" +
+                "dark red bags contain 2 dark orange bags.\n" +
+                "dark orange bags contain 2 dark yellow bags.\n" +
+                "dark yellow bags contain 2 dark green bags.\n" +
+                "dark green bags contain 2 dark blue bags.\n" +
+                "dark blue bags contain 2 dark violet bags.\n" +
+                "dark violet bags contain no other bags.";
+
+        List<String> bagsText = Arrays.asList(unformattedBagRules3.split("\n"));
         List<Bag> allBags = createInnerBags(bagsText);
         List<Bag> directGoldParents = getDirectParentsOfGold(allBags);
         List<Bag> goldParents = getGoldGrandParents(allBags, directGoldParents, directGoldParents.size());
