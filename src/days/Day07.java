@@ -621,7 +621,6 @@ public class Day07 {
     }
 
     private static List<Bag> getGoldGrandParents(List<Bag> allBags, List<Bag> goldParents, int added) {
-
         if (added > 0) {
             added = 0;
             for (Bag bag : allBags) {
@@ -636,7 +635,6 @@ public class Day07 {
         return goldParents;
     }
 
-    // Fix bug
     private static List<Bag> getDirectParentsOfGold(List<Bag> bags) {
         List<Bag> goldParents = new ArrayList<>();
 
