@@ -620,7 +620,7 @@ public class Day07 {
                 "dark blue bags contain 2 dark violet bags.\n" +
                 "dark violet bags contain no other bags.";
 
-        List<String> bagsText = Arrays.asList(unformattedBagRules3.split("\n"));
+        List<String> bagsText = Arrays.asList(unformattedBagRules.split("\n"));
         List<Bag> allBags = createInnerBags(bagsText);
         List<Bag> directGoldParents = getDirectParentsOfGold(allBags);
         List<Bag> goldParents = getGoldGrandParents(allBags, directGoldParents, directGoldParents.size());
@@ -631,15 +631,41 @@ public class Day07 {
         if (goldBag == null) {
             System.out.println(0);
         } else {
-            List<Bag> directGoldChildren = new ArrayList<>(goldBag.getInnerBags().keySet());
-            List<Bag> goldchildren = getGoldChildren(allBags, directGoldChildren);
-            System.out.println(goldchildren.size());
+            setAllGoldChildren(allBags, goldBag.getInnerBags());
+            long amount = 0;
+            int mult = 1;
+            amount = getAmountOfAllGoldChildren(goldBag, amount, mult);
+            System.out.println(amount);
         }
     }
 
-    // Implement
-    private static List<Bag> getGoldChildren(List<Bag> allBags, List<Bag> directGoldChildren) {
-        return null;
+    private static long getAmountOfAllGoldChildren(Bag goldBag, long amount, long mult) {
+        for (Map.Entry<Bag, Integer> entry : goldBag.getInnerBags().entrySet()) {
+            Bag bag = entry.getKey();
+            long bagAmount = entry.getValue();
+
+            amount = bagAmount + amount * mult;
+            amount = getAmountOfAllGoldChildren(bag, amount, bagAmount);
+
+        }
+        return amount;
+    }
+
+    // Fills the Gold Bag with all other bags recursively
+    private static void setAllGoldChildren(List<Bag> allBags, Map<Bag, Integer> innerBags) {
+        for (Bag child : innerBags.keySet()) {
+
+            for (Bag bag : allBags) {
+                if (bag.getColor().equals(child.getColor())) {
+                    child.setInnerBags(bag.getInnerBags());
+                    break;
+                }
+            }
+
+            if (!child.getInnerBags().isEmpty()) {
+                setAllGoldChildren(allBags, child.getInnerBags());
+            }
+        }
     }
 
     private static List<Bag> getGoldGrandParents(List<Bag> allBags, List<Bag> goldParents, int added) {
@@ -699,6 +725,7 @@ public class Day07 {
             amountBag = amountBag.replace("bag", "");
             amountBag = amountBag.replace(amountBag.substring(0, 2), "");
             amountBag = amountBag.replace(".", "");
+            amountBag = amountBag.replace("no other", "");
             innerBagColors.add(amountBag.substring(0, amountBag.length() - 1));
         }
         return innerBagColors;
@@ -718,8 +745,11 @@ public class Day07 {
 }
 
 class Bag {
+
     private String color;
     private Map<Bag, Integer> innerBags = new HashMap<>();
+    // for part 2
+    private boolean visited = false;
 
     public Bag(String color) {
         this.color = color;
@@ -741,6 +771,10 @@ class Bag {
         return innerBags;
     }
 
+    public void setInnerBags(Map<Bag, Integer> innerBags) {
+        this.innerBags = innerBags;
+    }
+
     // all Bags with the same color are equal.
     @Override
     public boolean equals(Object o) {
@@ -755,5 +789,13 @@ class Bag {
         int result = 17;
         result = 31 * result + color.hashCode();
         return result;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }
