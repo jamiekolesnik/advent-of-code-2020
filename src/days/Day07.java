@@ -620,7 +620,7 @@ public class Day07 {
                 "dark blue bags contain 2 dark violet bags.\n" +
                 "dark violet bags contain no other bags.";
 
-        List<String> bagsText = Arrays.asList(unformattedBagRules.split("\n"));
+        List<String> bagsText = Arrays.asList(unformattedBagRules3.split("\n"));
         List<Bag> allBags = createInnerBags(bagsText);
         List<Bag> directGoldParents = getDirectParentsOfGold(allBags);
         List<Bag> goldParents = getGoldGrandParents(allBags, directGoldParents, directGoldParents.size());
@@ -632,21 +632,17 @@ public class Day07 {
             System.out.println(0);
         } else {
             setAllGoldChildren(allBags, goldBag.getInnerBags());
-            long amount = 0;
-            int mult = 1;
-            amount = getAmountOfAllGoldChildren(goldBag, amount, mult);
+            int amount = getAmountOfAllGoldChildren(goldBag) - 1;
             System.out.println(amount);
         }
     }
 
-    private static long getAmountOfAllGoldChildren(Bag goldBag, long amount, long mult) {
+    private static int getAmountOfAllGoldChildren(Bag goldBag) {
+        int amount = 1;
         for (Map.Entry<Bag, Integer> entry : goldBag.getInnerBags().entrySet()) {
             Bag bag = entry.getKey();
-            long bagAmount = entry.getValue();
-
-            amount = bagAmount + amount * mult;
-            amount = getAmountOfAllGoldChildren(bag, amount, bagAmount);
-
+            int bagAmount = entry.getValue();
+            amount += getAmountOfAllGoldChildren(bag) * bagAmount;
         }
         return amount;
     }
