@@ -744,8 +744,6 @@ class Bag {
 
     private String color;
     private Map<Bag, Integer> innerBags = new HashMap<>();
-    // for part 2
-    private boolean visited = false;
 
     public Bag(String color) {
         this.color = color;
@@ -785,13 +783,5 @@ class Bag {
         int result = 17;
         result = 31 * result + color.hashCode();
         return result;
-    }
-
-    public boolean isVisited() {
-        return visited;
-    }
-
-    public void setVisited(boolean visited) {
-        this.visited = visited;
     }
 }
