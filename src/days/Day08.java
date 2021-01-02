@@ -6,16 +6,107 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Refactor spaghetti lol
 public class Day08 {
 
     public static void main(String[] args) throws IOException {
-        String inputData = "";
-        inputData = AdventDataReader.readFromInputStream("Day08_02.txt");
+        String inputData = AdventDataReader.readFromInputStream("Day08_02.txt");
 
-        List<Instruction> instructions = formatInputData(inputData);
+        List<Instruction> originalInstructions = formatInputData(inputData);
 
-        int criticalStep = getLastAccBeforeLoop(instructions);
-        System.out.println(criticalStep);
+//      int loopAccumulator = getLastAccBeforeLoop(originalInstructions);
+//      System.out.println(loopAccumulator);
+
+        int amountChangableOps = getAmountOfChangableOperations(originalInstructions);
+        int changeCount = 0;
+
+        boolean isLooped = true;
+        List<Instruction> instructions = new ArrayList<>();
+        while (isLooped && changeCount < amountChangableOps) {
+            changeCount++;
+            instructions = formatInputData(inputData);
+
+            isLooped = containsLoop(instructions);
+            if (isLooped) {
+                List<Instruction> changedInstructions = changeInstruction(instructions, changeCount);
+
+                for (Instruction instr : changedInstructions) {
+                    instr.setExecuted(false);
+                }
+
+                isLooped = containsLoop(changedInstructions);
+                if (!isLooped) {
+                    instructions = changedInstructions;
+                }
+            }
+
+        }
+        for (Instruction instr : instructions) {
+            instr.setExecuted(false);
+        }
+        int terminatedAccumulator = getLastAccAfterTermination(instructions);
+        System.out.println(terminatedAccumulator);
+    }
+
+    private static int getAmountOfChangableOperations(List<Instruction> originalInstructions) {
+        return (int) originalInstructions.stream().filter(instr -> instr.getOperation().equals("jmp") || instr.getOperation().equals("nop")).count();
+    }
+
+    private static List<Instruction> changeInstruction(List<Instruction> instructions, int changeCount) {
+        int count = 0;
+        for (Instruction instr : instructions) {
+            if (instr.getOperation().equals("jmp") || instr.getOperation().equals("nop")) {
+                count++;
+                if (count == changeCount) {
+                    if (instr.getOperation().equals("jmp")) {
+                        instr.setOperation("nop");
+                    } else if (instr.getOperation().equals("nop")) {
+                        instr.setOperation("jmp");
+                    }
+                    break;
+                }
+            }
+        }
+        return instructions;
+    }
+
+    private static int getLastAccAfterTermination(List<Instruction> instructions) {
+        int accumulator = 0;
+        for (int i = 0; i < instructions.size(); i++) {
+            Instruction instr = instructions.get(i);
+            if (instr.getOperation().equals("acc")) {
+                accumulator += instr.getArgument();
+            }
+            if (instr.getOperation().equals("jmp")) {
+                i += instructions.get(i).getArgument() - 1;
+            }
+        }
+
+        return accumulator;
+    }
+
+    private static boolean containsLoop(List<Instruction> instructions) {
+        for (int i = 0; i < instructions.size(); i++) {
+            Instruction instr = instructions.get(i);
+            if ((instr.getOperation().equals("nop") || instr.getOperation().equals("acc")) && instr.isExecuted()) {
+                return true;
+            }
+            if (instr.getOperation().equals("jmp")) {
+                // -1, because loop adds one after iteration
+                if (instr.isExecuted()) {
+                    return true;
+                }
+                i += instructions.get(i).getArgument() - 1;
+            }
+            instr.setExecuted(true);
+
+            // last instruction is only legit if it's a jump
+            if (i == instructions.size() - 1 && !instructions.get(i).getOperation().equals("jmp")) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     private static int getLastAccBeforeLoop(List<Instruction> instructions) {
@@ -39,24 +130,22 @@ public class Day08 {
     }
 
     private static List<Instruction> formatInputData(String inputData) {
-        String[] data = inputData.split(" |\n");
+        String[] data = inputData.split("[ \n]");
 
         List<Instruction> instructions = new ArrayList<>();
         for (int i = 0; i < data.length; i += 2) {
-            instructions.add(new Instruction(i, data[i], Integer.parseInt(data[i + 1])));
+            instructions.add(new Instruction(data[i], Integer.parseInt(data[i + 1])));
         }
         return instructions;
     }
 }
 
 class Instruction {
-    private int position;
     private String operation;
     private int argument;
     private boolean executed;
 
-    public Instruction(int position, String operation, int argument) {
-        this.position = position;
+    public Instruction(String operation, int argument) {
         this.operation = operation;
         this.argument = argument;
         this.executed = false;
@@ -74,23 +163,11 @@ class Instruction {
         return argument;
     }
 
-    public void setArgument(int argument) {
-        this.argument = argument;
-    }
-
     public boolean isExecuted() {
         return executed;
     }
 
     public void setExecuted(boolean executed) {
         this.executed = executed;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 }
