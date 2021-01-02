@@ -10,40 +10,34 @@ import java.util.List;
 public class Day08 {
 
     public static void main(String[] args) throws IOException {
-        String inputData = AdventDataReader.readFromInputStream("Day08_02.txt");
+        String inputData = AdventDataReader.readFromInputStream("Day08_01.txt");
 
-        List<Instruction> originalInstructions = formatInputData(inputData);
+        List<Instruction> instructions = formatInputData(inputData);
 
 //      int loopAccumulator = getLastAccBeforeLoop(originalInstructions);
 //      System.out.println(loopAccumulator);
 
-        int amountChangableOps = getAmountOfChangableOperations(originalInstructions);
+        int amountChangableOps = getAmountOfChangableOperations(instructions);
         int changeCount = 0;
 
-        boolean isLooped = true;
-        List<Instruction> instructions = new ArrayList<>();
+        boolean isLooped = containsLoop(instructions);
         while (isLooped && changeCount < amountChangableOps) {
             changeCount++;
             instructions = formatInputData(inputData);
 
-            isLooped = containsLoop(instructions);
-            if (isLooped) {
-                List<Instruction> changedInstructions = changeInstruction(instructions, changeCount);
+            List<Instruction> changedInstructions = changeInstruction(instructions, changeCount);
 
-                for (Instruction instr : changedInstructions) {
-                    instr.setExecuted(false);
-                }
-
-                isLooped = containsLoop(changedInstructions);
-                if (!isLooped) {
-                    instructions = changedInstructions;
-                }
+            for (Instruction instr : changedInstructions) {
+                instr.setExecuted(false);
             }
 
+            isLooped = containsLoop(changedInstructions);
         }
+
         for (Instruction instr : instructions) {
             instr.setExecuted(false);
         }
+
         int terminatedAccumulator = getLastAccAfterTermination(instructions);
         System.out.println(terminatedAccumulator);
     }
