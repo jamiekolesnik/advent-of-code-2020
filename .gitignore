@@ -72,3 +72,5 @@ fabric.properties
 
 # Playground file for trying stuff
 Playground.java
+*.sh
+*.swp
