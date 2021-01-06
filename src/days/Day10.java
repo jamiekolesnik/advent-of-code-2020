@@ -14,11 +14,13 @@ public class Day10 {
         String inputData = AdventDataReader.readFromInputStream("Day10_03.txt");
 
         List<Integer> jolts = formatInputData(inputData);
-        int highestJolt = Collections.max(jolts) + 3;
-        System.out.println(productOfJoltDiffernces(jolts, highestJolt));
+        // Your device has a built-in joltage adapter rated for 3 jolts higher than the highest-rated adapter in your bag.
+        jolts.add(Collections.max(jolts) + 3);
+
+        System.out.println(productOfJoltDiffernces(jolts));
     }
 
-    private static int productOfJoltDiffernces(List<Integer> jolts, int highestJolt) {
+    private static int productOfJoltDiffernces(List<Integer> jolts) {
         int sum1 = 0;
         int sum3 = 0;
 
@@ -33,9 +35,6 @@ public class Day10 {
             if (diff == 3) sum3++;
             else sum1++;
         }
-
-        if (highestJolt - currentJolt == 3) sum3++;
-        else sum1++;
 
         return sum1 * sum3;
     }
