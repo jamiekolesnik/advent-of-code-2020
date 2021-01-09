@@ -27,7 +27,6 @@ public class Day10 {
         System.out.println(sumOfAllCombinations);
     }
 
-    // Sloppy, but better than Brute-Force and does the job
     private static long getSumOfAllCombinations(List<Integer> jolts) {
 
         // Sums of combinations per adapter
@@ -35,29 +34,14 @@ public class Day10 {
 
         initializeAirplaneSocket(jolts, sums);
 
-        for (int i = 1; i < sums.size(); i++) {
-            long summand1 = 0;
-            long summand2 = 0;
-            long summand3 = 0;
+        // initialization of first two entries to avoid unnecessary if-statements in loop, which would otherwise require out ouf bounds checks
+        sums.set(1, sums.get(0));
+        sums.set(2, sums.get(0) + sums.get(1));
 
+        for (int i = 3; i < sums.size(); i++) {
             if (jolts.contains(i)) {
-                if (i == 1) {
-                    summand1 = sums.get(0);
-                }
-
-                if (i == 2) {
-                    summand1 = sums.get(i - 1);
-                    summand2 = sums.get(0);
-                }
-
-                if (i >= 3) {
-                    summand1 = sums.get(i - 1);
-                    summand2 = sums.get(i - 2);
-                    summand3 = sums.get(i - 3);
-                }
-
-                long val = summand1 + summand2 + summand3;
-                sums.set(i, val);
+                long sum = sums.get(i - 1) + sums.get(i - 2) + sums.get(i - 3);
+                sums.set(i, sum);
             } else {
                 sums.set(i, 0L);
             }
