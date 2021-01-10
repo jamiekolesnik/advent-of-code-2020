@@ -34,7 +34,6 @@ public class Day11 {
                 if (row.get(seatJ) == 'L') state = 'L';
                 if (row.get(seatJ) == '#') state = '#';
                 if (state != '.') checkSeat(rowUp, row, rowDown, seatJ, count, state, row.size());
-
             }
         }
 //        }
@@ -45,7 +44,7 @@ public class Day11 {
     // If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
     private static void checkSeat(List<Character> rowUp, List<Character> row, List<Character> rowDown, int seatJ, int count, char state, int limit) {
 
-        // TODO: Make it work
+        // TODO: Make it work -> better return "coordinates", because exercise demands not changed state of seat
 
         // right
         if (seatJ < limit - 1 && row.get(seatJ + 1) == '#') count++;
