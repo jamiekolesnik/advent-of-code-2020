@@ -9,7 +9,7 @@ import java.util.List;
 public class Day11 {
 
     public static void main(String[] args) throws IOException {
-        String inputData = AdventDataReader.readFromInputStream("Day11_01.txt");
+        String inputData = AdventDataReader.readFromInputStream("Day11_02.txt");
         List<List<Character>> seatLayout = formatInputData(inputData);
 
         stabilizeSeatLayout(seatLayout);
@@ -123,11 +123,8 @@ public class Day11 {
 
     private static void copyArrayList(List<List<Character>> copy, List<List<Character>> original) {
         copy.clear();
-        for (int i = 0; i < original.size(); i++) {
-            List<Character> chars = new ArrayList<>();
-            for (int j = 0; j < original.get(i).size(); j++) {
-                chars.add(original.get(i).get(j));
-            }
+        for (List<Character> characters : original) {
+            List<Character> chars = new ArrayList<>(characters);
             copy.add(chars);
         }
     }
