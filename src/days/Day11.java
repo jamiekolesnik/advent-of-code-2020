@@ -19,32 +19,49 @@ public class Day11 {
 
         printLayout(seatLayout);
 
-//        for (int i = 0; i < 3; i++) {
-        for (int rowI = 0; rowI < seatLayout.size(); rowI++) {
+        List<List<Character>> seatLayoutCopy = new ArrayList<>();
+        copyArrayList(seatLayoutCopy, seatLayout);
 
-            List<Character> rowUp = rowI > 0 ? seatLayout.get(rowI - 1) : null;
-            List<Character> row = seatLayout.get(rowI);
-            List<Character> rowDown = rowI < seatLayout.size() - 1 ? seatLayout.get(rowI + 1) : null;
+        boolean isStateChanged = false;
+        while (!isStateChanged) {
 
-            for (int seatJ = 0; seatJ < row.size(); seatJ++) {
+            List<Update> seatsToBeUpdated = new ArrayList<>();
+            for (int rowI = 0; rowI < seatLayout.size(); rowI++) {
 
-                int count = 0;
+                List<Character> rowUp = rowI > 0 ? seatLayout.get(rowI - 1) : null;
+                List<Character> row = seatLayout.get(rowI);
+                List<Character> rowDown = rowI < seatLayout.size() - 1 ? seatLayout.get(rowI + 1) : null;
 
-                char state = '.';
-                if (row.get(seatJ) == 'L') state = 'L';
-                if (row.get(seatJ) == '#') state = '#';
-                if (state != '.') checkSeat(rowUp, row, rowDown, seatJ, count, state, row.size());
+                for (int seatJ = 0; seatJ < row.size(); seatJ++) {
+
+                    if (row.get(seatJ) != '.')
+                        seatsToBeUpdated.add(checkSeat(rowUp, row, rowDown, seatJ, rowI, row.get(seatJ), row.size()));
+
+                }
+
             }
+            updateLayout(seatsToBeUpdated, seatLayout);
+            isStateChanged = stateChanged(seatLayout, seatLayoutCopy);
+            copyArrayList(seatLayoutCopy, seatLayout);
         }
-//        }
         printLayout(seatLayout);
+    }
+
+    private static boolean stateChanged(List<List<Character>> seatLayout, List<List<Character>> seatLayoutCopy) {
+        return seatLayout.equals(seatLayoutCopy);
+    }
+
+    private static void updateLayout(List<Update> seatsToBeUpdated, List<List<Character>> seatLayout) {
+        for (Update update : seatsToBeUpdated) {
+            if (update != null) seatLayout.get(update.getRow()).set(update.getSeat(), update.getState());
+        }
     }
 
     // If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes occupied.
     // If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
-    private static void checkSeat(List<Character> rowUp, List<Character> row, List<Character> rowDown, int seatJ, int count, char state, int limit) {
+    private static Update checkSeat(List<Character> rowUp, List<Character> row, List<Character> rowDown, int seatJ, int rowI, char state, int limit) {
 
-        // TODO: Make it work -> better return "coordinates", because exercise demands not changed state of seat
+        int count = 0;
 
         // right
         if (seatJ < limit - 1 && row.get(seatJ + 1) == '#') count++;
@@ -64,15 +81,15 @@ public class Day11 {
         // down right
         if (rowDown != null && seatJ > 0 && rowDown.get(seatJ - 1) == '#') count++;
 
-
+        Update update = null;
         if (state == 'L' && count == 0) {
-            row.set(seatJ, '#');
+            update = new Update(rowI, seatJ, '#');
         }
 
         if (state == '#' && count >= 4) {
-            row.set(seatJ, 'L');
+            update = new Update(rowI, seatJ, 'L');
         }
-
+        return update;
     }
 
     private static void printLayout(List<List<Character>> seatLayout) {
@@ -102,5 +119,34 @@ public class Day11 {
         }
 
         return seatLayout;
+    }
+}
+
+class Update {
+
+    private int row;
+    private int seat;
+    private char state;
+
+    public Update(int row, int seat, char state) {
+        this.row = row;
+        this.seat = seat;
+        this.state = state;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getSeat() {
+        return seat;
+    }
+
+    public char getState() {
+        return state;
+    }
+
+    public void setState(char state) {
+        this.state = state;
     }
 }
