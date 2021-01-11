@@ -13,6 +13,19 @@ public class Day11 {
         List<List<Character>> seatLayout = formatInputData(inputData);
 
         stabilizeSeatLayout(seatLayout);
+        System.out.println(countSumOfOccupiedSeats(seatLayout));
+    }
+
+    private static int countSumOfOccupiedSeats(List<List<Character>> seatLayout) {
+        int sum = 0;
+        for (List<Character> row : seatLayout) {
+            for (char seat : row) {
+                if (seat == '#') {
+                    sum++;
+                }
+            }
+        }
+        return sum;
     }
 
     private static void stabilizeSeatLayout(List<List<Character>> seatLayout) {
