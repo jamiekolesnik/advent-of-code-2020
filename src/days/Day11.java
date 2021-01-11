@@ -120,6 +120,17 @@ public class Day11 {
 
         return seatLayout;
     }
+
+    private static void copyArrayList(List<List<Character>> copy, List<List<Character>> original) {
+        copy.clear();
+        for (int i = 0; i < original.size(); i++) {
+            List<Character> chars = new ArrayList<>();
+            for (int j = 0; j < original.get(i).size(); j++) {
+                chars.add(original.get(i).get(j));
+            }
+            copy.add(chars);
+        }
+    }
 }
 
 class Update {
